@@ -3,8 +3,10 @@ package br.senai.sp.jandira.upload_firebase
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import br.senai.sp.jandira.upload_firebase.databinding.ActivityMainBinding
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +27,35 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
+
+        initiVars()
+        registerClickEvents()
+    }
+
+    //FUNCAO DE INICIALIZAÇÃO DOS RECURSOS DO FIREBASE
+    private fun initiVars(){
+        storageRef = FirebaseStorage.getInstance().reference.child("images")
+        firebaseFireStore = FirebaseFirestore.getInstance()
+    }
+
+    //FUNÇÃO PARA O LANÇADOR DE RECUPERAÇÃO DE IMAGENS DA GALERIA
+    private val resultLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ){
+        imageUri = it
+        binding.imageView.setImageURI(it)
+    }
+
+    private fun registerClickEvents(){
+
+        //TRATA O EVENTO DE CLICK DO COMPONENTE IMAGEVIEW
+        binding.imageView.setOnClickListener{
+            resultLauncher.launch("image/*")
+        }
     }
 }
