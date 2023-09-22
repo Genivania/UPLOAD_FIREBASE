@@ -3,6 +3,8 @@ package br.senai.sp.jandira.upload_firebase
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import br.senai.sp.jandira.upload_firebase.databinding.ActivityMainBinding
 import com.google.firebase.firestore.FirebaseFirestore
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         initiVars()
         registerClickEvents()
+
     }
 
     //FUNCAO DE INICIALIZAÇÃO DOS RECURSOS DO FIREBASE
@@ -50,12 +53,63 @@ class MainActivity : AppCompatActivity() {
         imageUri = it
         binding.imageView.setImageURI(it)
     }
-
+    //FUNCAO DE TGARTAMENTO DE CLICK
     private fun registerClickEvents(){
 
         //TRATA O EVENTO DE CLICK DO COMPONENTE IMAGEVIEW
         binding.imageView.setOnClickListener{
             resultLauncher.launch("image/*")
         }
+        //TRATA O EVENTO DE CLICK DO BOTAO DE UPLOAD
+        binding.uploadBtn.setOnClickListener {
+            uploadImage()
+        }
+
+    }
+
+    //FUNCAO UPLOAD
+    private fun uploadImage(){
+
+        binding.progressBar.visibility = View.VISIBLE
+
+        //DEFINE UM NOME UNICO PARA A IMAGEM COM USO DE UM VALOR TIMESSTAMP
+        storageRef = storageRef.child(System.currentTimeMillis().toString())
+
+        //EXECUTA O PROCESSO DE UPLOAD DA IMAGEM
+        imageUri?.let {
+            storageRef.putFile(it).addOnCompleteListener{
+                task->
+                    if (task.isSuccessful){
+                        Toast.makeText(this,
+                                                "UPLOAD CONCLUIDO!",
+                                                Toast.LENGTH_LONG).show()
+                    }else{
+                        Toast.makeText(this,
+                            "ERRO AO REALIZAR O UPLOAD!",
+                            Toast.LENGTH_LONG).show()
+                    }
+
+                binding.progressBar.visibility = View.VISIBLE
+            }
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
