@@ -1,5 +1,6 @@
 package br.senai.sp.jandira.upload_firebase
 
+import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -63,6 +64,10 @@ class MainActivity : AppCompatActivity() {
         //TRATA O EVENTO DE CLICK DO BOTAO DE UPLOAD
         binding.uploadBtn.setOnClickListener {
             uploadImage()
+        }
+
+        binding.showAllBtn.setOnClickListener {
+            startActivity(Intent(this, ImageFeed::class.java))
         }
 
     }

@@ -21,6 +21,10 @@ class ImageFeed : AppCompatActivity() {
 
         binding = ActivityImageFeedBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        initVars()
+        getImages()
+
     }
     //INICIALIZAÇÃO DAS VARIÁVEIS DO FIREBASE
     private fun initVars() {
