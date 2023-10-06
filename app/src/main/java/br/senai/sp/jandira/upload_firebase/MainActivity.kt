@@ -76,22 +76,65 @@ class MainActivity : AppCompatActivity() {
         storageRef = storageRef.child(System.currentTimeMillis().toString())
 
         //EXECUTA O PROCESSO DE UPLOAD DA IMAGEM
+//        imageUri?.let {
+//            storageRef.putFile(it).addOnCompleteListener{
+//                task->
+//                    if (task.isSuccessful){
+//                        Toast.makeText(this,
+//                                                "UPLOAD CONCLUIDO!",
+//                                                Toast.LENGTH_LONG).show()
+//                    }else{
+//                        Toast.makeText(this,
+//                            "ERRO AO REALIZAR O UPLOAD!",
+//                            Toast.LENGTH_LONG).show()
+//                    }
+//
+//                binding.progressBar.visibility = View.VISIBLE
+//                binding.imageView.setImageResource(R.drawable.upload)
+//            }
+//        }
+
+        //EXECUTA O PROCESSO DE UPLOAD DA IMAGEM - V2 - UPLOAD NO STORAGE E GRAVCAO NO FIREBASE
         imageUri?.let {
-            storageRef.putFile(it).addOnCompleteListener{
-                task->
-                    if (task.isSuccessful){
-                        Toast.makeText(this,
-                                                "UPLOAD CONCLUIDO!",
-                                                Toast.LENGTH_LONG).show()
-                    }else{
-                        Toast.makeText(this,
-                            "ERRO AO REALIZAR O UPLOAD!",
-                            Toast.LENGTH_LONG).show()
+            storageRef.putFile(it).addOnCompleteListener { task->
+
+                if (task.isSuccessful) {
+
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+
+                        val map = HashMap<String, Any>()
+                        map["pic"] = uri.toString()
+
+                        firebaseFireStore.collection("images").add(map).addOnCompleteListener { firestoreTask ->
+
+                            if (firestoreTask.isSuccessful){
+                                Toast.makeText(this, "Uploaded Successfully", Toast.LENGTH_SHORT).show()
+
+                            }else{
+                                Toast.makeText(this, firestoreTask.exception?.message, Toast.LENGTH_SHORT).show()
+
+                            }
+                            binding.progressBar.visibility = View.GONE
+                            binding.imageView.setImageResource(R.drawable.upload)
+
+                        }
                     }
 
-                binding.progressBar.visibility = View.VISIBLE
+                }else{
+
+                    Toast.makeText(this,  task.exception?.message, Toast.LENGTH_SHORT).show()
+
+                }
+
+                //BARRA DE PROGRESSO DO UPLOAD
+                binding.progressBar.visibility = View.GONE
+
+                //TROCA A IMAGEM PARA A IMAGEM PADRÃO
+                binding.imageView.setImageResource(R.drawable.upload)
+
             }
         }
+
     }
 }
 
